@@ -565,7 +565,7 @@ app.post("/reset-password", async (req, res) => {
     if (tokenData) {
       const salt = await bcrypt.genSalt(10);
       const newPassword = await bcrypt.hash(req.body.password, salt);
-      const userData = await User.findByIdAndUpdate(
+      const userData = await User.findByOneAndUpdate(
         { _id: tokenData._id },
         { $set: { password: newPassword, resetToken: "" } },
         { new: true }
@@ -585,7 +585,7 @@ app.post("/reset-password", async (req, res) => {
 // update user by id
 app.post("/edituser", async (req, res) => {
   try {
-    const _id = req.body._id;
+    const email = req.body.email;
     const newinfoData = {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
@@ -595,8 +595,8 @@ app.post("/edituser", async (req, res) => {
       image: req.body.image,
     };
 
-    const updateData = await User.findByIdAndUpdate(
-      { _id: _id },
+    const updateData = await User.findByOneAndUpdate(
+      { email: email },
       {
         $set: {
           firstname: newinfoData.firstname,
@@ -622,14 +622,14 @@ app.post("/edituser", async (req, res) => {
 // update user by id
 app.post("/editinfo", async (req, res) => {
   try {
-    const _id = req.body._id;
+    const email = req.body.email;
     const newinfoData = {
       name: req.body.name,
       email: req.body.email,
     };
 
-    const updateData = await User.findByIdAndUpdate(
-      { _id: _id },
+    const updateData = await User.findByOneAndUpdate(
+      { email: email },
       {
         $set: {
           name: newinfoData.name,
@@ -651,7 +651,7 @@ app.post("/editinfo", async (req, res) => {
 // update user by id
 app.post("/editmedecin", async (req, res) => {
   try {
-    const _id = req.body._id;
+    const email = req.body.email;
     const newinfoData = {
       specialite: req.body.specialite,
       experience: req.body.experience,
@@ -659,8 +659,8 @@ app.post("/editmedecin", async (req, res) => {
       rating: req.body.rating,
     };
 
-    const updateData = await User.findByIdAndUpdate(
-      { _id: _id },
+    const updateData = await User.findByOneAndUpdate(
+      { email: email },
       {
         $set: {
           specialite: newinfoData.specialite,
@@ -684,12 +684,12 @@ app.post("/editmedecin", async (req, res) => {
 // edit role
 app.post("/editrole", async (req, res) => {
   try {
-    const _id = req.body._id;
+    const email = req.body.email;
     const newinfoData = {
       role: req.body.role,
     };
-    const updateData = await User.findByIdAndUpdate(
-      { _id: _id },
+    const updateData = await User.findByOneAndUpdate(
+      { email: email },
       {
         $set: {
           role: newinfoData.role,
@@ -733,28 +733,6 @@ app.delete("/delete/test/:_id", async (req, res) => {
   console.log(req.params);
   let data = await User.deleteOne(req.params);
   res.send(data);
-});
-
-//add medecin
-app.post("/addmedecin", async (req, res, User) => {
-  try {
-    //create new user
-    const newMedecin = new Medecin({
-      specialite: req.body.specialite,
-      experience: req.body.experience,
-      description: req.body.description,
-      user: req.body.user,
-    });
-
-    //save test and respond
-    const medecin = await newMedecin.save();
-    res
-      .status(200, { status: "ok", medecin })
-      .json({ status: "Medecin created successfully!", medecin });
-  } catch (err) {
-    console.log(err);
-    res.status(500, { status: "error" }).json({ status: "error" });
-  }
 });
 
 // Listener
