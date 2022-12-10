@@ -619,6 +619,94 @@ app.post("/edituser", async (req, res) => {
   }
 });
 
+// update user by id
+app.post("/editinfo", async (req, res) => {
+  try {
+    const _id = req.body._id;
+    const newinfoData = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    const updateData = await User.findByIdAndUpdate(
+      { _id: _id },
+      {
+        $set: {
+          name: newinfoData.name,
+          email: newinfoData.email,
+        },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Your data has been updated",
+      updateData,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// update user by id
+app.post("/editmedecin", async (req, res) => {
+  try {
+    const _id = req.body._id;
+    const newinfoData = {
+      specialite: req.body.specialite,
+      experience: req.body.experience,
+      patient: req.body.patient,
+      rating: req.body.rating,
+    };
+
+    const updateData = await User.findByIdAndUpdate(
+      { _id: _id },
+      {
+        $set: {
+          specialite: newinfoData.specialite,
+          experience: newinfoData.experience,
+          patient: newinfoData.patient,
+          rating: newinfoData.rating,
+        },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Your data has been updated",
+      updateData,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// edit role
+app.post("/editrole", async (req, res) => {
+  try {
+    const _id = req.body._id;
+    const newinfoData = {
+      role: req.body.role,
+    };
+    const updateData = await User.findByIdAndUpdate(
+      { _id: _id },
+      {
+        $set: {
+          role: newinfoData.role,
+        },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Your data has been updated",
+      updateData,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // create test
 
 app.post("/addtest", async (req, res) => {

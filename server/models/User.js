@@ -20,6 +20,33 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      require: true,
+      min: 3,
+      max: 20,
+      default: null,
+    },
+    specialite: {
+      type: String,
+      default: null,
+    },
+    experience: {
+      type: Number,
+      default: null,
+    },
+    patient: {
+      type: Number,
+      default: null,
+    },
+    rating: {
+      type: mongoose.Types.Decimal128,
+      default: null,
+    },
+    description: {
+      type: String,
+      default: null,
+    },
     firstname: {
       type: String,
       require: true,
