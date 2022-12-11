@@ -721,21 +721,28 @@ app.get("/recherchespectaliter", async (req, res) => {
 });
 
 //count specialiter
-/*
+
 app.get("/countpectaliter", async (req, res) => {
   try {
     let x = await User.find().select(["specialite"]);
-
+    let y = 0;
+    //let z = 0;
+    let arr = [];
     for (let i = 0; i < x.length; i++) {
-      if (x[i].specialite == "null") {
-      }
-      console.log("x");
+      if (x[i].specialite == null) {
+        y = y + 1;
+      } /*else if (x[i].specialite == "specialiter") {
+        z = z + 1;
+      }*/
     }
-    return res.status(200).json({ ms: x });
+    //ga: z
+    arr.push({ specialite: y });
+    console.log(arr);
+    return res.status(200).json({ ms: arr });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-});*/
+});
 
 // create test
 
