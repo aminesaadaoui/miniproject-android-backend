@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import Cors from "cors";
 import User from "./models/User.js";
 import Test from "./models/Test.js";
-import Medecin from "./models/Medecin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -565,7 +564,7 @@ app.post("/reset-password", async (req, res) => {
     if (tokenData) {
       const salt = await bcrypt.genSalt(10);
       const newPassword = await bcrypt.hash(req.body.password, salt);
-      const userData = await User.findByOneAndUpdate(
+      const userData = await User.findOneAndUpdate(
         { _id: tokenData._id },
         { $set: { password: newPassword, resetToken: "" } },
         { new: true }
@@ -595,7 +594,7 @@ app.post("/edituser", async (req, res) => {
       image: req.body.image,
     };
 
-    const updateData = await User.findByOneAndUpdate(
+    const updateData = await User.findOneAndUpdate(
       { email: email },
       {
         $set: {
@@ -628,7 +627,7 @@ app.post("/editinfo", async (req, res) => {
       email: req.body.email,
     };
 
-    const updateData = await User.findByOneAndUpdate(
+    const updateData = await User.findOneAndUpdate(
       { email: email },
       {
         $set: {
@@ -659,7 +658,7 @@ app.post("/editmedecin", async (req, res) => {
       rating: req.body.rating,
     };
 
-    const updateData = await User.findByOneAndUpdate(
+    const updateData = await User.findOneAndUpdate(
       { email: email },
       {
         $set: {
@@ -688,7 +687,7 @@ app.post("/editrole", async (req, res) => {
     const newinfoData = {
       role: req.body.role,
     };
-    const updateData = await User.findByOneAndUpdate(
+    const updateData = await User.findOneAndUpdate(
       { email: email },
       {
         $set: {
@@ -706,6 +705,37 @@ app.post("/editrole", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+//recherche spécialiter
+
+app.get("/recherchespectaliter", async (req, res) => {
+  try {
+    let medecin = await User.find({ role: "medecin" }).select([
+      "specialite",
+      "role",
+    ]);
+    return res.status(200).json({ ms: medecin });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+//count specialiter
+/*
+app.get("/countpectaliter", async (req, res) => {
+  try {
+    let x = await User.find().select(["specialite"]);
+
+    for (let i = 0; i < x.length; i++) {
+      if (x[i].specialite == "null") {
+      }
+      console.log("x");
+    }
+    return res.status(200).json({ ms: x });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});*/
 
 // create test
 
