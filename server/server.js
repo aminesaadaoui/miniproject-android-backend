@@ -141,7 +141,7 @@ app.post("/login", async (req, res) => {
     );
 
     //send response
-    res.status(200).json({ email: user.email, user: token });
+    res.status(200).json({ email: user.email, user: token, role: user.role });
   } catch (err) {
     res.status(500).json({ err: err, status: "Wrong emails or password" });
   }
@@ -715,6 +715,38 @@ app.get("/recherchespectaliter", async (req, res) => {
       "role",
     ]);
     return res.status(200).json({ ms: medecin });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/patientdata", async (req, res) => {
+  try {
+    let patient = await User.find({ role: "patient" }).select([
+      "firstname",
+      "lastname",
+      "genders",
+      "adresse",
+      "birthdate",
+      "name",
+    ]);
+    return res.status(200).json({ ms: patient });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/doctordata", async (req, res) => {
+  try {
+    let doctor = await User.find({ role: "doctor" }).select([
+      "name",
+      "specialite",
+      "experience",
+      "patient",
+      "rating",
+      "description",
+    ]);
+    return res.status(200).json({ ms: doctor });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
