@@ -2,12 +2,17 @@ import express, { json } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Cors from "cors";
+import multer from "multer";
+import sharp from "sharp";
 import User from "./models/User.js";
 import Test from "./models/Test.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 // App Config
 const app = express();
@@ -802,6 +807,36 @@ app.delete("/delete/test/:_id", async (req, res) => {
   console.log(req.params);
   let data = await User.deleteOne(req.params);
   res.send(data);
+});
+
+//configure multer
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const upload = multer({
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error("Please upload a valid image file"));
+    }
+    cb(undefined, true);
+  },
+});
+
+app.post("/image", upload.single("upload"), async (req, res) => {
+  try {
+    await sharp(req.file.buffer)
+      .resize({ width: 250, height: 250 })
+      .png()
+      .toFile(__dirname + `/images/${req.file.originalname}`);
+    res.status(201).send("Image uploaded succesfully");
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
 });
 
 // Listener
