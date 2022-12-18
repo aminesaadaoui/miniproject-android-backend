@@ -712,7 +712,7 @@ app.post("/editrole", async (req, res) => {
 });
 
 //recherche spécialiter
-
+/*
 app.get("/recherche", async (req, res) => {
   try {
     let medecin = await User.find({ role: "medecin" }).select([
@@ -723,7 +723,7 @@ app.get("/recherche", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-});
+});*/
 
 // recherche spécialiter  par medecin
 
@@ -777,18 +777,10 @@ app.get("/doctordata", async (req, res) => {
 
 //count specialiter grouped by
 
-app.get("/recherchespecialiter", async (req, res) => {
+app.get("/groupspecialiter", async (req, res) => {
   try {
-    let x = await User.find({ specialite: req.body.specialite }).select([
-      "specialite",
-    ]);
-    // let y = 0;
-    //let z = 0;
-    let arr = [];
-
-    arr.push({ specialite: x });
-
-    return res.status(200).json({ ms: arr });
+    let x = await User.aggregate().sortByCount("specialite");
+    return res.status(200).json({ ms: x });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -841,14 +833,19 @@ const upload = multer({
 
 app.post("/image", upload.single("upload"), async (req, res) => {
   try {
+    const _id = req.body._id;
     await sharp(req.file.buffer)
       .resize({ width: 250, height: 250 })
       .png()
       .toFile(__dirname + `/images/${req.file.originalname}`);
+    const x = await User.findByIdAndUpdate(
+      { _id: _id },
+      { $set: { image: `/images/${req.file.originalname}` } }
+    );
     res.status(201).send("Image uploaded succesfully");
   } catch (error) {
     console.log(error);
-    res.status(400).send(error);
+    res.status(500).send(error);
   }
 });
 
