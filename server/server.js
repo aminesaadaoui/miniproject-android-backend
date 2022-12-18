@@ -713,11 +713,29 @@ app.post("/editrole", async (req, res) => {
 
 //recherche spécialiter
 
-app.get("/recherchespectaliter", async (req, res) => {
+app.get("/recherche", async (req, res) => {
   try {
     let medecin = await User.find({ role: "medecin" }).select([
       "specialite",
       "role",
+    ]);
+    return res.status(200).json({ ms: medecin });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// recherche spécialiter  par medecin
+
+app.get("/recherche/specialite", async (req, res) => {
+  try {
+    let medecin = await User.find({ specialite: req.body.specialite }).select([
+      "name",
+      "specialite",
+      "experience",
+      "patient",
+      "rating",
+      "description",
     ]);
     return res.status(200).json({ ms: medecin });
   } catch (err) {
@@ -757,24 +775,19 @@ app.get("/doctordata", async (req, res) => {
   }
 });
 
-//count specialiter
+//count specialiter grouped by
 
-app.get("/countpectaliter", async (req, res) => {
+app.get("/recherchespecialiter", async (req, res) => {
   try {
-    let x = await User.find().select(["specialite"]);
-    let y = 0;
+    let x = await User.find({ specialite: req.body.specialite }).select([
+      "specialite",
+    ]);
+    // let y = 0;
     //let z = 0;
     let arr = [];
-    for (let i = 0; i < x.length; i++) {
-      if (x[i].specialite == null) {
-        y = y + 1;
-      } /*else if (x[i].specialite == "specialiter") {
-        z = z + 1;
-      }*/
-    }
-    //ga: z
-    arr.push({ specialite: y });
-    console.log(arr);
+
+    arr.push({ specialite: x });
+
     return res.status(200).json({ ms: arr });
   } catch (err) {
     return res.status(500).json({ error: err.message });
