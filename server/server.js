@@ -779,8 +779,15 @@ app.get("/doctordata", async (req, res) => {
 
 app.get("/groupspecialiter", async (req, res) => {
   try {
-    let x = await User.aggregate().sortByCount("specialite");
-    return res.status(200).json({ ms: x });
+    let specialite = await User.aggregate([
+      {
+        $group: {
+          _id: "$specialite",
+          count: { $sum: 1 }, // this means that the count will increment by 1
+        },
+      },
+    ]);
+    return res.status(200).json({ message: specialite });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
