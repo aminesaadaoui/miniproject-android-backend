@@ -856,6 +856,16 @@ app.post("/image", upload.single("upload"), async (req, res) => {
   }
 });
 
+// display image
+app.get("/display_image", async (req, res) => {
+  try {
+    let image = await User.find({ email: req.body.email }).select("image");
+    return res.status(200).json({ ms: image });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // Listener
 app.listen(port, () => {
   console.log(`listening on localhost:${port} 🚪 `);
