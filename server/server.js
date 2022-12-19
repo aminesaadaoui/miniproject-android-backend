@@ -370,7 +370,7 @@ app.post("/forget-password", async (req, res) => {
                                                                         style="text-align:left;padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px">
                                                                         <div class="alignment" align="left">
                                                                             <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:48px;width:212px;v-text-anchor:middle;" arcsize="34%" stroke="false" fillcolor="#506bec"><w:anchorlock/><v:textbox inset="5px,0px,0px,0px"><center style="color:#ffffff; font-family:Arial, sans-serif; font-size:15px"><![endif]-->
-                                                                            <a href="http://localhost:3000/reset?token=${token}"
+                                                                            <a href="http://localhost:5000/reset?token=${token}"
                                                                                 target="_blank"
                                                                                 style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#506bec;border-radius:16px;width:auto;border-top:0px solid TRANSPARENT;font-weight:undefined;border-right:0px solid TRANSPARENT;border-bottom:0px solid TRANSPARENT;border-left:0px solid TRANSPARENT;padding-top:8px;padding-bottom:8px;font-family:Helvetica Neue, Helvetica, Arial, sans-serif;text-align:center;mso-border-alt:none;word-break:keep-all;"><span
                                                                                     style="padding-left:25px;padding-right:20px;font-size:15px;display:inline-block;letter-spacing:normal;"><span
@@ -561,7 +561,7 @@ app.post("/reset-password", async (req, res) => {
         .json("confirm password does not match with password");
     }
 
-    const tokenData = await User.findOne({ resetToken: token });
+   const tokenData = await User.findOne({ resetToken: token });
     if (!tokenData)
       return res
         .status(400)
