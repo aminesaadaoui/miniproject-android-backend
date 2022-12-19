@@ -561,7 +561,7 @@ app.post("/reset-password", async (req, res) => {
         .json("confirm password does not match with password");
     }
 
-   const tokenData = await User.findOne({ resetToken: token });
+    const tokenData = await User.findOne({ resetToken: token });
     if (!tokenData)
       return res
         .status(400)
@@ -840,13 +840,13 @@ const upload = multer({
 
 app.post("/image", upload.single("upload"), async (req, res) => {
   try {
-    const _id = req.body._id;
+    const email = req.body.email;
     await sharp(req.file.buffer)
       .resize({ width: 250, height: 250 })
       .png()
       .toFile(__dirname + `/images/${req.file.originalname}`);
-    const x = await User.findByIdAndUpdate(
-      { _id: _id },
+    const x = await User.findOneAndUpdate(
+      { email: email },
       { $set: { image: `/images/${req.file.originalname}` } }
     );
     res.status(201).send("Image uploaded succesfully");
