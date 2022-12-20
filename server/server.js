@@ -102,6 +102,15 @@ app.post("/userdata", (req, res) => {
         id: savedUser._id,
         name: savedUser.name,
         email: savedUser.email,
+        firstname: savedUser.firstname,
+        lastname: savedUser.lastname,
+        specialite: savedUser.specialite,
+        experience: savedUser.experience,
+        patient: savedUser.patient,
+        rating: savedUser.rating,
+        genders: savedUser.genders,
+        adresse: savedUser.adresse,
+        birthdate: savedUser.birthdate,
       })
     );
   });
@@ -781,13 +790,23 @@ app.get("/groupspecialiter", async (req, res) => {
   try {
     let specialite = await User.aggregate([
       {
+        $match: {
+          specialite: {
+            $exists: true,
+            $ne: null,
+          },
+        },
+      },
+      {
         $group: {
-          _id: "$specialite",
-          count: { $sum: 1 }, // this means that the count will increment by 1
+          _id: {
+            specialite: "$specialite",
+          },
+          count: { $sum: 1 },
         },
       },
     ]);
-    return res.status(200).json({ message: specialite });
+    return res.status(200).json(specialite);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
