@@ -752,6 +752,24 @@ app.get("/recherche/specialite", async (req, res) => {
   }
 });
 
+// recherche doctor
+
+app.get("/recherche/doctor", async (req, res) => {
+  try {
+    let doctor = await User.find({ email: req.body.email }).select([
+      "name",
+      "specialite",
+      "experience",
+      "patient",
+      "rating",
+      "description",
+    ]);
+    return res.status(200).json({ doctor });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/patientdata", async (req, res) => {
   try {
     let patient = await User.find({ role: "patient" }).select([
