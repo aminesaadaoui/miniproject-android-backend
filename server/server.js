@@ -746,15 +746,15 @@ app.get("/recherche/specialite", async (req, res) => {
       "rating",
       "description",
     ]);
-    return res.status(200).json({ ms: medecin });
+    return res.status(200).json({ medecin });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 });
 
 // recherche doctor
-
-app.get("/recherche/doctor", async (req, res) => {
+/*
+app.get("/recherchedoctor", async (req, res) => {
   try {
     let doctor = await User.find({ email: req.body.email }).select([
       "name",
@@ -764,10 +764,27 @@ app.get("/recherche/doctor", async (req, res) => {
       "rating",
       "description",
     ]);
-    return res.status(200).json({ doctor });
+    return res.status(200).json(doctor);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+});*/
+
+app.post("/recherche/doctor", (req, res) => {
+  const { email } = req.body;
+  User.findOne({ email: email }).then((savedUser) => {
+    res.status(200).send(
+      JSON.stringify({
+        //200 OK
+        name: savedUser.name,
+        specialite: savedUser.specialite,
+        experience: savedUser.experience,
+        patient: savedUser.patient,
+        rating: savedUser.rating,
+        description: savedUser.description,
+      })
+    );
+  });
 });
 
 app.get("/patientdata", async (req, res) => {
@@ -790,6 +807,7 @@ app.get("/doctordata", async (req, res) => {
   try {
     let doctor = await User.find({ role: "doctor" }).select([
       "name",
+      "email",
       "specialite",
       "experience",
       "patient",
@@ -807,23 +825,10 @@ app.get("/doctordata", async (req, res) => {
 app.get("/groupspecialiter", async (req, res) => {
   try {
     let specialite = await User.aggregate([
-      {
-        $match: {
-          specialite: {
-            $exists: true,
-            $ne: null,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            specialite: "$specialite",
-          },
-          count: { $sum: 1 },
-        },
-      },
+      { $unwind: "$specialite" },
+      { $sortByCount: "$specialite" },
     ]);
+
     return res.status(200).json(specialite);
   } catch (err) {
     return res.status(500).json({ error: err.message });
