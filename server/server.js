@@ -5,6 +5,7 @@ import Cors from "cors";
 import multer from "multer";
 import sharp from "sharp";
 import User from "./models/User.js";
+import Booking from "./models/Booking.js";
 import Test from "./models/Test.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -111,6 +112,7 @@ app.post("/userdata", (req, res) => {
         genders: savedUser.genders,
         adresse: savedUser.adresse,
         birthdate: savedUser.birthdate,
+        description: savedUser.description,
       })
     );
   });
@@ -379,7 +381,7 @@ app.post("/forget-password", async (req, res) => {
                                                                         style="text-align:left;padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px">
                                                                         <div class="alignment" align="left">
                                                                             <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:48px;width:212px;v-text-anchor:middle;" arcsize="34%" stroke="false" fillcolor="#506bec"><w:anchorlock/><v:textbox inset="5px,0px,0px,0px"><center style="color:#ffffff; font-family:Arial, sans-serif; font-size:15px"><![endif]-->
-                                                                            <a href="http://localhost:5000/reset?token=${token}"
+                                                                            <a href="http://192.168.1.13:5000/reset?token=${token}"
                                                                                 target="_blank"
                                                                                 style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#506bec;border-radius:16px;width:auto;border-top:0px solid TRANSPARENT;font-weight:undefined;border-right:0px solid TRANSPARENT;border-bottom:0px solid TRANSPARENT;border-left:0px solid TRANSPARENT;padding-top:8px;padding-bottom:8px;font-family:Helvetica Neue, Helvetica, Arial, sans-serif;text-align:center;mso-border-alt:none;word-break:keep-all;"><span
                                                                                     style="padding-left:25px;padding-right:20px;font-size:15px;display:inline-block;letter-spacing:normal;"><span
@@ -720,55 +722,7 @@ app.post("/editrole", async (req, res) => {
   }
 });
 
-//recherche spécialiter
-/*
-app.get("/recherche", async (req, res) => {
-  try {
-    let medecin = await User.find({ role: "medecin" }).select([
-      "specialite",
-      "role",
-    ]);
-    return res.status(200).json({ ms: medecin });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});*/
-
-// recherche spécialiter  par medecin
-
-app.get("/recherche/specialite", async (req, res) => {
-  try {
-    let medecin = await User.find({ specialite: req.body.specialite }).select([
-      "name",
-      "specialite",
-      "experience",
-      "patient",
-      "rating",
-      "description",
-    ]);
-    return res.status(200).json({ medecin });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // recherche doctor
-/*
-app.get("/recherchedoctor", async (req, res) => {
-  try {
-    let doctor = await User.find({ email: req.body.email }).select([
-      "name",
-      "specialite",
-      "experience",
-      "patient",
-      "rating",
-      "description",
-    ]);
-    return res.status(200).json(doctor);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});*/
 
 app.post("/recherche/doctor", (req, res) => {
   const { email } = req.body;
@@ -776,7 +730,9 @@ app.post("/recherche/doctor", (req, res) => {
     res.status(200).send(
       JSON.stringify({
         //200 OK
-        name: savedUser.name,
+        _id: savedUser._id,
+        firstname: savedUser.firstname,
+        lastname: savedUser.lastname,
         specialite: savedUser.specialite,
         experience: savedUser.experience,
         patient: savedUser.patient,
@@ -785,6 +741,19 @@ app.post("/recherche/doctor", (req, res) => {
       })
     );
   });
+});
+
+// recherche spécialiter  par medecin
+
+app.get("/recherche/specialite", async (req, res) => {
+  try {
+    let medecin = await User.find({
+      specialite: req.headers.specialite,
+    }).select(["email", "firstname", "lastname", "specialite"]);
+    return res.status(200).json(medecin);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 app.get("/patientdata", async (req, res) => {
@@ -806,15 +775,12 @@ app.get("/patientdata", async (req, res) => {
 app.get("/doctordata", async (req, res) => {
   try {
     let doctor = await User.find({ role: "doctor" }).select([
-      "name",
       "email",
+      "firstname",
+      "lastname",
       "specialite",
-      "experience",
-      "patient",
-      "rating",
-      "description",
     ]);
-    return res.status(200).json({ ms: doctor });
+    return res.status(200).json(doctor);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -898,13 +864,24 @@ app.post("/image", upload.single("upload"), async (req, res) => {
   }
 });
 
-// display image
-app.get("/display_image", async (req, res) => {
+app.post("/addbooking", async (req, res) => {
   try {
-    let image = await User.find({ email: req.body.email }).select("image");
-    return res.status(200).json({ ms: image });
+    //create new user
+
+    const newBooking = new Booking({
+      doctor: req.body.doctor,
+      patient: req.body.patient,
+      statu: req.body.statu,
+      date: req.body.date,
+      time: req.body.time,
+    });
+
+    //save user and respond
+    const booking = await newBooking.save();
+    res.status(200, { status: "ok", booking }).json({ status: booking });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log(err);
+    res.status(500, { status: "error" }).json({ status: "error" });
   }
 });
 
