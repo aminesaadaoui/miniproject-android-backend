@@ -864,6 +864,8 @@ app.post("/image", upload.single("upload"), async (req, res) => {
   }
 });
 
+// add a booking
+
 app.post("/addbooking", async (req, res) => {
   try {
     //create new user
@@ -883,6 +885,23 @@ app.post("/addbooking", async (req, res) => {
     console.log(err);
     res.status(500, { status: "error" }).json({ status: "error" });
   }
+});
+
+//display time
+
+app.post("/displaytime", (req, res) => {
+  const { doctor } = req.body;
+  Booking.findOne({ doctor: doctor }).then((savedBooking) => {
+    res.status(200).send(
+      JSON.stringify({
+        //200 OK
+        _id: savedBooking._id,
+        time: savedBooking.time,
+        date: savedBooking.date,
+        patient: savedBooking.patient,
+      })
+    );
+  });
 });
 
 // Listener

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -67,6 +66,7 @@ const UserSchema = new mongoose.Schema(
       enum: ["Male", "female"],
       default: "Male",
     },
+
     adresse: {
       type: String,
       default: null,
@@ -79,6 +79,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+   
 
     resetToken: {
       type: String,
@@ -95,7 +96,5 @@ UserSchema.methods.toJSON = function () {
   delete obj.password;
   return obj;
 };
-
-
 
 export default mongoose.model("User", UserSchema);

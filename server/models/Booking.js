@@ -10,7 +10,7 @@ const BookingSchema = new mongoose.Schema({
   statu: {
     type: Number,
     enum: [0, 1],
-    default: 1,
+    default: 0,
   },
   doctor: {
     type: mongoose.Schema.Types.ObjectId,
