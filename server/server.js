@@ -889,7 +889,7 @@ app.post("/addbooking", async (req, res) => {
 
 //display time
 
-app.post("/displaytime", (req, res) => {
+app.post("/displaybooking", (req, res) => {
   const { doctor } = req.body;
   Booking.findOne({ doctor: doctor }).then((savedBooking) => {
     res.status(200).send(
@@ -902,6 +902,18 @@ app.post("/displaytime", (req, res) => {
       })
     );
   });
+});
+
+app.get("/recherche/time", async (req, res) => {
+  try {
+    let booking = await Booking.find({
+      doctor: req.body.doctor,
+      date: req.body.date,
+    }).select(["time"]);
+    return res.status(200).json(booking);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 // Listener
