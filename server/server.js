@@ -855,7 +855,11 @@ app.post("/image", upload.single("upload"), async (req, res) => {
       .toFile(__dirname + `/images/${req.file.originalname}`);
     const x = await User.findOneAndUpdate(
       { email: email },
-      { $set: { image: `/images/${req.file.originalname}` } }
+      {
+        $set: {
+          image: `http://localhost:5000/images/${req.file.originalname}`,
+        },
+      }
     );
     res.status(201).send("Image uploaded succesfully");
   } catch (error) {
@@ -887,23 +891,28 @@ app.post("/addbooking", async (req, res) => {
   }
 });
 
-//display time
-
-app.post("/displaybooking", (req, res) => {
-  const { doctor } = req.body;
-  Booking.findOne({ doctor: doctor }).then((savedBooking) => {
-    res.status(200).send(
-      JSON.stringify({
-        //200 OK
-        _id: savedBooking._id,
-        time: savedBooking.time,
-        date: savedBooking.date,
-        patient: savedBooking.patient,
-      
-      })
+//update statu
+app.post("/editstatu", async (req, res) => {
+  try {
+    const _id = req.body._id;
+    const updateData = await Booking.findOneAndUpdate(
+      { _id: _id },
+      {
+        $set: {
+          statu: 1,
+        },
+      },
+      { new: true }
     );
-  });
+    return res.status(200).json({
+      updateData,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
+
+///recherche patient
 
 app.post("/recherche/patient", (req, res) => {
   const { patient } = req.body;
@@ -915,6 +924,8 @@ app.post("/recherche/patient", (req, res) => {
     );
   });
 });
+
+/// recherche time
 
 app.get("/recherche/time", async (req, res) => {
   try {
@@ -931,7 +942,6 @@ app.get("/recherche/time", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
-
 
 // Listener
 app.listen(port, () => {
