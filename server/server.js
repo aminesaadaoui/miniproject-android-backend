@@ -899,6 +899,18 @@ app.post("/displaybooking", (req, res) => {
         time: savedBooking.time,
         date: savedBooking.date,
         patient: savedBooking.patient,
+      
+      })
+    );
+  });
+});
+
+app.post("/recherche/patient", (req, res) => {
+  const { patient } = req.body;
+  User.findOne({ patient: patient }).then((savedUser) => {
+    res.status(200).send(
+      JSON.stringify({
+        firstname: savedUser.firstname,
       })
     );
   });
@@ -906,15 +918,20 @@ app.post("/displaybooking", (req, res) => {
 
 app.get("/recherche/time", async (req, res) => {
   try {
-    let booking = await Booking.find({
-      doctor: req.body.doctor,
-      date: req.body.date,
-    }).select(["time"]);
+    let booking = await Booking.find(
+      {
+        doctor: req.body.doctor,
+        date: req.body.date,
+      },
+      { time: 1, _id: 0 }
+    ).select();
+
     return res.status(200).json(booking);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 });
+
 
 // Listener
 app.listen(port, () => {
