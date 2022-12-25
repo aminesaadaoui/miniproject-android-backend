@@ -857,7 +857,7 @@ app.post("/image", upload.single("upload"), async (req, res) => {
       { email: email },
       {
         $set: {
-          image: `http://localhost:5000/images/${req.file.originalname}`,
+          image: `/images/${req.file.originalname}`,
         },
       }
     );
