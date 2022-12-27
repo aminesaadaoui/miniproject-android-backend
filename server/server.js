@@ -7,6 +7,7 @@ import sharp from "sharp";
 import User from "./models/User.js";
 import Booking from "./models/Booking.js";
 import Test from "./models/Test.js";
+import Review from "./models/Review.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -868,6 +869,29 @@ app.post("/image", upload.single("upload"), async (req, res) => {
   }
 });
 
+// image review
+app.post("/image/review", upload.single("upload"), async (req, res) => {
+  try {
+    const doctor = req.body.doctor;
+    await sharp(req.file.buffer)
+      .resize({ width: 250, height: 250 })
+      .png()
+      .toFile(__dirname + `/reviews/${req.file.originalname}`);
+    const x = await Review.findOneAndUpdate(
+      { doctor: doctor },
+      {
+        $set: {
+          imagereview: `/reviews/${req.file.originalname}`,
+        },
+      }
+    );
+    res.status(201).send("Image uploaded succesfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 // add a booking
 
 app.post("/addbooking", async (req, res) => {
@@ -938,6 +962,37 @@ app.get("/recherche/time", async (req, res) => {
     ).select();
 
     return res.status(200).json(booking);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/addreview", async (req, res) => {
+  try {
+    //create new user
+
+    const newReview = new Review({
+      doctor: req.body.doctor,
+      patient: req.body.patient,
+      booking: req.body.booking,
+      remarque: req.body.remarque,
+    });
+
+    //save user and respond
+    const review = await newReview.save();
+    res.status(200, { status: "ok", review }).json(review);
+  } catch (err) {
+    console.log(err);
+    res.status(500, { status: "error" }).json({ status: "error" });
+  }
+});
+
+app.get("/recherche/review", async (req, res) => {
+  try {
+    let review = await Review.find({
+      doctor: req.body.doctor,
+    }).select(["patient", "booking", "remarque"]);
+    return res.status(200).json(review);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
